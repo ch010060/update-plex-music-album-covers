@@ -1,6 +1,8 @@
 import click
 import requests
 from mutagen.id3 import ID3, PictureType, ID3NoHeaderError
+from mutagen.flac import Picture, FLAC
+from mutagen import File
 from mutagen import MutagenError
 from xml.etree import ElementTree
 from plexapi.myplex import MyPlexAccount
@@ -51,13 +53,20 @@ def get_front_cover_pic(file_):
     pic_front_cover = None
 
     try:
-        tags = ID3(file_)
-        pics = tags.getall("APIC")
+        if file_.lower().endswith(".mp3"):
+            tags = ID3(file_)
+            pics = tags.getall("APIC")
+        elif file_.lower().endswith(".flac"):
+            audio = File(file_)
+            pics = audio.pictures
+        else:
+            return pic_front_cover
+            
         pics_front_cover = list(filter(lambda pic: pic.type == PictureType.COVER_FRONT, pics))
         if pics_front_cover:
             pic_front_cover = pics_front_cover[0].data
 
-    except (ID3NoHeaderError, MutagenError):
+    except:
         pass
 
     return pic_front_cover
