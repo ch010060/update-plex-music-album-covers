@@ -2,6 +2,7 @@ import click
 import requests
 from mutagen.id3 import ID3, PictureType, ID3NoHeaderError
 from mutagen.flac import Picture, FLAC
+from mutagen.mp4 import MP4Tags, MP4
 from mutagen import File
 from mutagen import MutagenError
 from xml.etree import ElementTree
@@ -56,15 +57,22 @@ def get_front_cover_pic(file_):
         if file_.lower().endswith(".mp3"):
             tags = ID3(file_)
             pics = tags.getall("APIC")
+            pics_front_cover = list(filter(lambda pic: pic.type == PictureType.COVER_FRONT, pics))
+            if pics_front_cover:
+                pic_front_cover = pics_front_cover[0].data
         elif file_.lower().endswith(".flac"):
             audio = File(file_)
             pics = audio.pictures
+            pics_front_cover = list(filter(lambda pic: pic.type == PictureType.COVER_FRONT, pics))
+            if pics_front_cover:
+                pic_front_cover = pics_front_cover[0].data
+        elif file_.lower().endswith(".m4a"):
+            audio = File(file_)
+            tags = audio.tags
+            if tags['covr']:
+                pic_front_cover = tags['covr'][0]
         else:
             return pic_front_cover
-            
-        pics_front_cover = list(filter(lambda pic: pic.type == PictureType.COVER_FRONT, pics))
-        if pics_front_cover:
-            pic_front_cover = pics_front_cover[0].data
 
     except:
         pass
