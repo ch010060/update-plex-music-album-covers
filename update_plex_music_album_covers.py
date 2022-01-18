@@ -2,7 +2,7 @@ import click
 import requests
 from mutagen.id3 import ID3, PictureType, ID3NoHeaderError
 from mutagen import MutagenError
-from plexapi.compat import ElementTree
+from xml.etree import ElementTree
 from plexapi.myplex import MyPlexAccount
 import logging
 
